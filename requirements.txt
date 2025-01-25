@@ -1,0 +1,7 @@
+pydantic>=2.10.6
+pydantic-ai>=0.0.20 
+python-dotenv
+fastapi
+uvicorn
+pydantic-ai
+logfire
