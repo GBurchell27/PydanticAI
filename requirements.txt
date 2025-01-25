@@ -5,3 +5,5 @@ fastapi
 uvicorn
 pydantic-ai
 logfire
+opentelemetry-instrumentation-asgi
+python-multipart
