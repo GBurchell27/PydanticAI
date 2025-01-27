@@ -44,8 +44,8 @@ from pydantic_ai.messages import (  # Message-related components
 load_dotenv()
 print("API Key loaded:", bool(os.getenv('OPENAI_API_KEY')))
 
-# Create an AI agent using OpenAI's GPT-4 model
-agent = Agent('openai:gpt-4')
+# Create an AI agent using OpenAI's GPT-4o model
+agent = Agent('openai:gpt-4o')
 THIS_DIR = Path(__file__).parent  # Get the directory where this script is located
 
 
@@ -60,6 +60,24 @@ async def lifespan(_app: fastapi.FastAPI):
 
 
 # Create the FastAPI application instance with the lifespan manager
+# How It All Works Together
+
+# When Someone Visits Your Chat:
+# They knock on the front door (/)
+# FastAPI gives them the chat webpage
+
+# When the Page Loads:
+# The browser asks for the JavaScript code (/chat_app.ts)
+# It also asks for any old messages (/chat/)
+
+# When Someone Sends a Message:
+# The message goes through the message door (/chat/)
+# The AI thinks about it and sends back a response
+# The message gets saved in the database
+
+# When Someone Wants to Start Fresh:
+# They use the clear door (/chat/clear)
+# All old messages get erased
 app = fastapi.FastAPI(lifespan=lifespan)
 
 
@@ -101,7 +119,7 @@ async def get_chat(database: Database = Depends(get_db)) -> Response:
         media_type='text/plain',
     )
 
-
+# Chat Message Type
 class ChatMessage(TypedDict):
     """
     TypedDict defining the structure of chat messages sent to the browser.
@@ -172,6 +190,17 @@ async def post_chat(
         await database.add_messages(result.new_messages_json())
 
     return StreamingResponse(stream_messages(), media_type='text/plain')
+
+
+@app.post('/chat/clear')
+async def clear_chat(database: Database = Depends(get_db)) -> Response:
+    """Clear all messages from the database."""
+    await database._asyncify(
+        database._execute,
+        'DELETE FROM messages;',
+        commit=True,
+    )
+    return Response(status_code=204)
 
 
 # Type variables for generic function signatures
@@ -274,6 +303,8 @@ class Database:
 
 
 # Run the application using uvicorn if this file is run directly
+# This is the main entry point for the application
+# Run: python chat_app.py
 if __name__ == '__main__':
     import uvicorn
     uvicorn.run(

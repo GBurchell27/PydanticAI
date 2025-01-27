@@ -88,3 +88,16 @@ document.querySelector('form').addEventListener('submit', (e) => onSubmit(e).cat
 
 // load messages on page load
 fetch('/chat/').then(onFetchResponse).catch(onError)
+
+// Clear chat functionality
+document.getElementById('clear-chat').addEventListener('click', async () => {
+  try {
+    spinner.classList.add('active')
+    await fetch('/chat/clear', { method: 'POST' })
+    convElement.innerHTML = ''  // Clear the conversation display
+    spinner.classList.remove('active')
+    promptInput.focus()
+  } catch (error) {
+    onError(error)
+  }
+})
