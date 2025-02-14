@@ -44,6 +44,7 @@ calc_agent = Agent(
 async def calculator(ctx: RunContext, expression: str) -> float:
     """Evaluate mathematical expressions"""
     return eval(expression)
+
 # Use tool through agent
 result = calc_agent.run_sync('What is 15 cubed?')
 print(result.data)  # Output: 3375
