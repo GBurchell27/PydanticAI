@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+print("API Key loaded:", bool(os.getenv('OPENAI_API_KEY')))
 
 ##################################################    
 # 1. BASIC AGENT SETUP
@@ -66,7 +67,7 @@ class WeatherResponse(BaseModel):
 # Create weather agent
 weather_agent = Agent(
     'openai:gpt-4o',
-    result_type=WeatherResponse,
+    result_type=WeatherResponse, # this is the structure of the response
     system_prompt="Provide weather information in structured format."
 )
 # Get structured weather data
